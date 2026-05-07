@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WordUp</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Literata:opsz,wght@7..72,400;7..72,500;7..72,600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #12110f;
+      --bg-soft: #171512;
+      --panel: rgba(26, 23, 19, 0.94);
+      --panel-strong: rgba(30, 26, 22, 0.98);
+      --line: rgba(229, 191, 130, 0.12);
+      --line-strong: rgba(229, 191, 130, 0.22);
+      --ink: #f5efe6;
+      --muted: #b7ab9c;
+      --accent: #efb45f;
+      --accent-2: #8f78ff;
+      --accent-3: #3db28c;
+      --accent-4: #d98b73;
+      --danger: #d46b5f;
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.34);
+      --radius: 22px;
+      --radius-sm: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(239, 180, 95, 0.08), transparent 22%),
+        radial-gradient(circle at top right, rgba(143, 120, 255, 0.08), transparent 18%),
+        linear-gradient(180deg, #141311, #0e0d0c);
+      font-family: "Literata", Georgia, serif;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.14;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+      background-size: 3px 3px, 3px 3px;
+      mix-blend-mode: soft-light;
+    }
+
+    .shell {
+      width: min(1400px, calc(100vw - 28px));
+      margin: 24px auto 40px;
+      display: grid;
+      gap: 18px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    .hero {
+      display: grid;
+      gap: 16px;
+      padding: 18px 18px 0;
+    }
+
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .brand-row h1 {
+      margin: 0;
+      font-family: "Playfair Display", Georgia, serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+    }
+
+    .brand-row p {
+      margin: 0;
+      color: var(--muted);
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.95rem;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 420px minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .input-panel {
+      padding: 18px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .workspace-panel {
+      padding: 18px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .section-label {
+      margin: 0 0 10px;
+      font-family: "IBM Plex Mono", monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 0.76rem;
+      color: var(--muted);
+    }
+
+    label {
+      display: grid;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    input,
+    textarea,
+    select,
+    button {
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--ink);
+      padding: 14px 16px;
+      font: inherit;
+    }
+
+    input,
+    textarea,
+    select {
+      font-family: "Literata", Georgia, serif;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #807466;
+    }
+
+    textarea {
+      min-height: 108px;
+      resize: vertical;
+    }
+
+    .field-row {
+      display: grid;
+      gap: 16px;
+    }
+
+    .button-row,
+    .editor-toolbar,
+    .chapter-toolbar,
+    .recipe-toolbar,
+    .export-toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      cursor: pointer;
+      border-color: rgba(239, 180, 95, 0.15);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+      color: var(--ink);
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.92rem;
+      transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      border-color: rgba(239, 180, 95, 0.34);
+    }
+
+    button.primary {
+      background: linear-gradient(180deg, #f3e4ca, #f2d39a);
+      color: #16120d;
+      border: none;
+      font-weight: 600;
+    }
+
+    button.secondary {
+      max-width: fit-content;
+      min-width: 120px;
+    }
+
+    button.ghost {
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--muted);
+    }
+
+    button.active-toggle {
+      color: var(--accent);
+      border-color: rgba(239, 180, 95, 0.34);
+      background: rgba(239, 180, 95, 0.08);
+    }
+
+    .flow-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .flow-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      background: rgba(255, 255, 255, 0.02);
+      min-height: 180px;
+    }
+
+    .flow-card h3,
+    .artifact-panel h3,
+    .cookbook-shell h3,
+    .details-section h3 {
+      margin: 0 0 10px;
+      font-family: "Playfair Display", Georgia, serif;
+      font-size: 1.2rem;
+    }
+
+    .flow-list,
+    .details-list,
+    .chapter-list,
+    .recipe-stack {
+      display: grid;
+      gap: 10px;
+    }
+
+    .flow-item,
+    .details-item,
+    .chapter-item,
+    .recipe-card,
+    .artifact-block {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .flow-item strong,
+    .details-item strong,
+    .chapter-item strong,
+    .artifact-block strong,
+    .recipe-card strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 0.94rem;
+      line-height: 1.5;
+    }
+
+    .output-shell {
+      display: grid;
+      gap: 14px;
+    }
+
+    .artifact-shell {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 14px;
+    }
+
+    .artifact-panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.02);
+      display: grid;
+      gap: 12px;
+    }
+
+    .proof-block {
+      display: grid;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .proof-block.hidden {
+      display: none !important;
+    }
+
+    .proof-title {
+      margin: 0;
+      font-family: "Playfair Display", Georgia, serif;
+      font-size: 1.05rem;
+      color: var(--ink);
+    }
+
+    .proof-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .proof-row {
+      display: grid;
+      grid-template-columns: 108px 28px minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 10px 12px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.02);
+      transition: border-color 160ms ease, background 160ms ease, color 160ms ease;
+    }
+
+    .proof-row.active {
+      color: var(--ink);
+      border-color: rgba(239, 180, 95, 0.28);
+      background: rgba(239, 180, 95, 0.06);
+    }
+
+    .proof-row.logic.active {
+      border-color: rgba(143, 120, 255, 0.28);
+      background: rgba(143, 120, 255, 0.08);
+    }
+
+    .proof-row.automation.active {
+      border-color: rgba(61, 178, 140, 0.28);
+      background: rgba(61, 178, 140, 0.08);
+    }
+
+    .proof-row.output.active {
+      border-color: rgba(217, 139, 115, 0.28);
+      background: rgba(217, 139, 115, 0.08);
+    }
+
+    .proof-label,
+    .proof-check {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.88rem;
+    }
+
+    .proof-check {
+      color: transparent;
+    }
+
+    .proof-row.active .proof-check {
+      color: var(--accent);
+    }
+
+    .proof-row.logic.active .proof-check {
+      color: var(--accent-2);
+    }
+
+    .proof-row.automation.active .proof-check {
+      color: var(--accent-3);
+    }
+
+    .proof-row.output.active .proof-check {
+      color: var(--accent-4);
+    }
+
+    .artifact-code {
+      white-space: pre-wrap;
+      word-break: break-word;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      background: rgba(12, 11, 10, 0.78);
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      min-height: 220px;
+    }
+
+    .output-toggle-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .toggle-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .cookbook-shell {
+      display: none;
+      grid-template-columns: 260px minmax(0, 1fr);
+      gap: 14px;
+    }
+
+    .cookbook-shell.enabled {
+      display: grid;
+    }
+
+    .chapter-sidebar,
+    .recipe-editor-panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.02);
+      padding: 14px;
+    }
+
+    .chapter-item {
+      cursor: grab;
+    }
+
+    .chapter-item.active {
+      border-color: rgba(239, 180, 95, 0.34);
+      background: rgba(239, 180, 95, 0.08);
+    }
+
+    .chapter-anchor {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .drag-handle {
+      cursor: grab;
+      color: var(--muted);
+      font-family: "IBM Plex Mono", monospace;
+      user-select: none;
+      flex-shrink: 0;
+    }
+
+    .recipe-card {
+      display: grid;
+      gap: 12px;
+    }
+
+    .recipe-card.dragging,
+    .chapter-item.dragging {
+      opacity: 0.55;
+      border-style: dashed;
+    }
+
+    .recipe-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .recipe-grid.full {
+      grid-template-columns: 1fr;
+    }
+
+    .recipe-card textarea {
+      min-height: 120px;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .recipe-card input,
+    .recipe-card select {
+      font-family: "Literata", Georgia, serif;
+    }
+
+    .raw-paste {
+      min-height: 110px;
+    }
+
+    .chapter-manager-note,
+    .cookbook-note {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .api-settings {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.02);
+      display: grid;
+      gap: 10px;
+    }
+
+    .api-settings input {
+      font-family: "IBM Plex Mono", monospace;
+    }
+
+    details {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    summary {
+      cursor: pointer;
+      font-family: "IBM Plex Mono", monospace;
+      color: var(--muted);
+    }
+
+    .details-grid {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .details-section {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .details-code {
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: "IBM Plex Mono", monospace;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .status-banner {
+      border: 1px solid rgba(239, 180, 95, 0.18);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      background: rgba(239, 180, 95, 0.05);
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .status-banner strong {
+      color: var(--accent);
+    }
+
+    @media (max-width: 1220px) {
+      .main-grid,
+      .cookbook-shell,
+      .details-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 860px) {
+      .flow-grid,
+      .recipe-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .shell {
+        width: min(100vw - 16px, 1400px);
+        margin: 16px auto 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero card">
+      <div class="brand-row">
+        <h1>WordUp</h1>
+        <p>prompt -&gt; build</p>
+      </div>
+    </section>
+
+    <section class="main-grid">
+      <form id="launch-form" class="input-panel card">
+        <div class="field-row">
+          <div>
+            <p class="section-label">Product or idea name</p>
+            <input id="productName" name="productName" placeholder="Name your product or idea" />
+          </div>
+          <div>
+            <p class="section-label">Prompt</p>
+            <textarea id="prompt" name="prompt" placeholder="Describe what you want to build in plain language."></textarea>
+          </div>
+          <div>
+            <p class="section-label">Goals</p>
+            <textarea id="goals" name="goals" placeholder="What does success look like?"></textarea>
+          </div>
+          <div>
+            <p class="section-label">Constraints</p>
+            <textarea id="constraints" name="constraints" placeholder="Budget, timeline, tech limits..."></textarea>
+          </div>
+          <div class="field-row hidden">
+            <input id="ideaName" name="ideaName" value="" />
+            <select id="templateChoice" name="templateChoice">
+              <option value="">Auto Recommend</option>
+              <option value="product-launch">Product Launch</option>
+              <option value="service-offer">Service Offer</option>
+              <option value="content-engine">Content Engine</option>
+              <option value="ops-system">Operations System</option>
+            </select>
+            <select id="maxAgents" name="maxAgents">
+              <option value="6" selected>6</option>
+            </select>
+            <select id="executionMode" name="executionMode">
+              <option value="simulate" selected>Simulate</option>
+              <option value="plan">Plan Only</option>
+            </select>
+          </div>
+        </div>
+        <div class="button-row">
+          <button class="primary" type="submit">Run WordFlow ↗</button>
+          <button class="secondary ghost" type="button" id="clearButton">Clear</button>
+        </div>
+      </form>
+
+      <section class="workspace-panel card">
+        <div class="flow-grid">
+          <article class="flow-card">
+            <h3>Input</h3>
+            <div id="input-stage" class="flow-list"></div>
+          </article>
+          <article class="flow-card">
+            <h3>Logic</h3>
+            <div id="logic-stage" class="flow-list"></div>
+          </article>
+          <article class="flow-card">
+            <h3>Automation</h3>
+            <div id="automation-stage" class="flow-list"></div>
+          </article>
+        </div>
+
+        <section class="output-shell">
+          <div class="output-toggle-row">
+            <div>
+              <p class="section-label">Output</p>
+            </div>
+            <div class="toggle-group">
+              <button type="button" id="artifact-toggle" class="secondary active-toggle">Artifact View</button>
+              <button type="button" id="cookbook-toggle" class="secondary hidden">Cookbook Editor</button>
+            </div>
+          </div>
+
+          <section id="artifact-shell" class="artifact-shell">
+            <article class="artifact-panel">
+              <h3>Built Artifact</h3>
+              <div id="ilao-proof" class="proof-block hidden">
+                <p class="proof-title">Here's how WordUp thought:</p>
+                <div class="proof-list">
+                  <div class="proof-row input" data-proof-stage="input">
+                    <div class="proof-label">Input</div>
+                    <div class="proof-check">✔</div>
+                    <div class="meta" id="proof-input-detail"></div>
+                  </div>
+                  <div class="proof-row logic" data-proof-stage="logic">
+                    <div class="proof-label">Logic</div>
+                    <div class="proof-check">✔</div>
+                    <div class="meta" id="proof-logic-detail"></div>
+                  </div>
+                  <div class="proof-row automation" data-proof-stage="automation">
+                    <div class="proof-label">Automation</div>
+                    <div class="proof-check">✔</div>
+                    <div class="meta" id="proof-automation-detail"></div>
+                  </div>
+                  <div class="proof-row output" data-proof-stage="output">
+                    <div class="proof-label">Output</div>
+                    <div class="proof-check">✔</div>
+                    <div class="meta" id="proof-output-detail"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="status-banner" id="artifact-status">
+                <strong>Idle</strong> Submit an idea to generate an artifact or a finish-line roadmap.
+              </div>
+              <pre id="artifact-code" class="artifact-code">No artifact yet.</pre>
+            </article>
+
+            <section id="cookbook-shell" class="cookbook-shell">
+              <aside class="chapter-sidebar">
+                <div class="chapter-toolbar">
+                  <h3>Chapters</h3>
+                </div>
+                <p class="chapter-manager-note">
+                  Reorder chapters, jump to a section, and keep the cookbook structure tight.
+                </p>
+                <div class="api-settings">
+                  <label>
+                    Claude API Key
+                    <input id="anthropic-api-key" type="password" placeholder="Stored locally for Parse only" />
+                  </label>
+                  <div class="export-toolbar">
+                    <button type="button" class="secondary" id="save-api-key">Save Key</button>
+                    <button type="button" class="secondary ghost" id="clear-api-key">Clear Key</button>
+                  </div>
+                </div>
+                <div class="chapter-toolbar">
+                  <button type="button" class="secondary" id="add-chapter-button">Add Chapter</button>
+                  <button type="button" class="secondary" id="export-cookbook-button">Export HTML</button>
+                </div>
+                <div id="chapter-list" class="chapter-list"></div>
+              </aside>
+
+              <section class="recipe-editor-panel">
+                <div class="editor-toolbar">
+                  <h3>Cookbook Editor</h3>
+                  <button type="button" class="secondary" id="add-recipe-button">Add Recipe</button>
+                </div>
+                <p class="cookbook-note">
+                  Edit recipes directly, paste rough notes, parse them with Claude, and export a clean structured cookbook file.
+                </p>
+                <div id="recipe-stack" class="recipe-stack"></div>
+              </section>
+            </section>
+          </section>
+        </section>
+
+        <details>
+          <summary>Show internal details</summary>
+          <div class="details-grid">
+            <section class="details-section">
+              <h3>Template Options</h3>
+              <div id="templates" class="details-list"></div>
+            </section>
+            <section class="details-section">
+              <h3>Agent Team</h3>
+              <div id="team" class="details-list"></div>
+            </section>
+            <section class="details-section">
+              <h3>Workflow</h3>
+              <div id="workflow" class="details-list"></div>
+            </section>
+            <section class="details-section">
+              <h3>Execution</h3>
+              <div id="execution" class="details-list"></div>
+            </section>
+          </div>
+          <div class="details-grid">
+            <section class="details-section">
+              <h3>Next Prompt</h3>
+              <pre id="next-prompt" class="details-code">Submit an idea to generate the next build prompt.</pre>
+            </section>
+            <section class="details-section">
+              <h3>Git Note</h3>
+              <div id="git-note" class="details-code">Submit an idea to generate the git handoff note.</div>
+            </section>
+          </div>
+        </details>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const ANTHROPIC_MODEL = "claude-sonnet-4-20250514";
+    const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
+    const STORAGE_KEY = "wordup:anthropic-api-key";
+
+    const form = document.getElementById("launch-form");
+    const clearButton = document.getElementById("clearButton");
+    const inputStageEl = document.getElementById("input-stage");
+    const logicStageEl = document.getElementById("logic-stage");
+    const automationStageEl = document.getElementById("automation-stage");
+    const templatesEl = document.getElementById("templates");
+    const teamEl = document.getElementById("team");
+    const workflowEl = document.getElementById("workflow");
+    const executionEl = document.getElementById("execution");
+    const nextPromptEl = document.getElementById("next-prompt");
+    const gitNoteEl = document.getElementById("git-note");
+    const artifactCodeEl = document.getElementById("artifact-code");
+    const artifactStatusEl = document.getElementById("artifact-status");
+    const proofBlockEl = document.getElementById("ilao-proof");
+    const proofInputDetailEl = document.getElementById("proof-input-detail");
+    const proofLogicDetailEl = document.getElementById("proof-logic-detail");
+    const proofAutomationDetailEl = document.getElementById("proof-automation-detail");
+    const proofOutputDetailEl = document.getElementById("proof-output-detail");
+    const artifactToggleButton = document.getElementById("artifact-toggle");
+    const cookbookToggleButton = document.getElementById("cookbook-toggle");
+    const cookbookShellEl = document.getElementById("cookbook-shell");
+    const chapterListEl = document.getElementById("chapter-list");
+    const recipeStackEl = document.getElementById("recipe-stack");
+    const addRecipeButton = document.getElementById("add-recipe-button");
+    const addChapterButton = document.getElementById("add-chapter-button");
+    const exportCookbookButton = document.getElementById("export-cookbook-button");
+    const apiKeyInput = document.getElementById("anthropic-api-key");
+    const saveApiKeyButton = document.getElementById("save-api-key");
+    const clearApiKeyButton = document.getElementById("clear-api-key");
+
+    const state = {
+      latestResult: null,
+      latestPayload: null,
+      outputMode: "artifact",
+      cookbookEnabled: false,
+      chapterOrder: [],
+      recipes: [],
+      activeChapter: "",
+      dragRecipeId: null,
+      dragChapterName: null,
+    };
+
+    const defaultPrompt = "Describe what you want to build in plain language.";
+
+    function uid(prefix = "id") {
+      return `${prefix}-${Math.random().toString(36).slice(2, 10)}`;
+    }
+
+    function sleep(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
+    function titleCase(value) {
+      return String(value || "")
+        .toLowerCase()
+        .replace(/\b\w/g, (letter) => letter.toUpperCase());
+    }
+
+    function splitList(value) {
+      return String(value || "")
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean);
+    }
+
+    function renderList(target, items) {
+      target.innerHTML = items
+        .map((item) => `<div class="details-item">${item}</div>`)
+        .join("");
+    }
+
+    function renderFlowList(target, items) {
+      target.innerHTML = items
+        .map((item) => `<div class="flow-item">${item}</div>`)
+        .join("");
+    }
+
+    function buildArtifactText(result, payload) {
+      const lines = [
+        `# ${result.mission.title || payload.product_name || "Artifact"}`,
+        "",
+        `Idea Type: ${result.mission.primary_idea_type || "General"}`,
+        `Recommended Template: ${result.output.selected_template || "Auto"}`,
+        "",
+        "## Input Snapshot",
+        payload.prompt || "No prompt supplied.",
+        "",
+        "## Positioning",
+        result.output.positioning || "",
+        "",
+        "## Offer",
+        result.output.offer || "",
+        "",
+        "## First Deliverable",
+        result.output.first_deliverable || "",
+        "",
+        "## Build Scope",
+        ...(result.output.build_scope || []).map((item) => `- ${item}`),
+        "",
+        "## Grounded Terms",
+        ...(result.output.detected_inputs || []).map((item) => `- ${item}`),
+        "",
+        "## Next Prompt",
+        result.next_prompt || "",
+      ];
+
+      return lines.join("\n").trim();
+    }
+
+    function shouldEnableCookbookMode(result, payload) {
+      const primary = String(result?.mission?.primary_idea_type || "").toLowerCase();
+      const detected = (result?.output?.detected_inputs || []).map((item) => String(item).toLowerCase());
+      const domainTags = (result?.mission?.domain_tags || []).map((item) => String(item).toLowerCase());
+      const prompt = `${payload?.product_name || ""} ${payload?.idea_name || ""} ${payload?.prompt || ""}`.toLowerCase();
+
+      return (
+        primary === "cookbook" ||
+        primary === "content" ||
+        domainTags.includes("content") ||
+        detected.some((item) => ["cookbook", "recipe", "recipes", "ingredients", "chapter", "chapters"].includes(item)) ||
+        /\bcookbook\b|\brecipe\b|\brecipes\b|\bingredients\b|\bchapter\b|\bchapters\b/.test(prompt)
+      );
+    }
+
+    function createInitialCookbookState(result, payload) {
+      const productTitle = payload.product_name || result.mission.title || "Untitled Cookbook";
+      const promptText = payload.prompt || "";
+      const detected = result.output.detected_inputs || [];
+      const chapterSeed = detected
+        .filter((item) => /chapter|seasonal|breakfast|dinner|dessert|sauce|starter|main/i.test(item))
+        .slice(0, 3)
+        .map((item) => titleCase(item));
+
+      const chapterOrder = chapterSeed.length ? chapterSeed : ["Chapter 1"];
+      const defaultChapter = chapterOrder[0];
+
+      state.chapterOrder = chapterOrder;
+      state.activeChapter = defaultChapter;
+      state.recipes = [
+        {
+          id: uid("recipe"),
+          title: productTitle,
+          headnote: result.output.offer || promptText,
+          servings: "",
+          prepTime: "",
+          cookTime: "",
+          ingredients: "",
+          steps: "",
+          chapter: defaultChapter,
+          rawPaste: "",
+        }
+      ];
+    }
+
+    function updateArtifactStatus(message, tone = "default") {
+      const accent = tone === "error" ? "var(--danger)" : tone === "ready" ? "var(--accent)" : "var(--muted)";
+      artifactStatusEl.innerHTML = `<strong style="color:${accent}">${tone === "error" ? "Attention" : tone === "ready" ? "Ready" : "Status"}</strong> ${message}`;
+    }
+
+    function resetProofBlock() {
+      proofBlockEl.classList.add("hidden");
+      proofInputDetailEl.textContent = "";
+      proofLogicDetailEl.textContent = "";
+      proofAutomationDetailEl.textContent = "";
+      proofOutputDetailEl.textContent = "";
+      proofBlockEl.querySelectorAll(".proof-row").forEach((row) => row.classList.remove("active"));
+    }
+
+    function showProofBlock() {
+      proofBlockEl.classList.remove("hidden");
+    }
+
+    function activateProofStage(stage, detail) {
+      const row = proofBlockEl.querySelector(`[data-proof-stage="${stage}"]`);
+      if (!row) return;
+      row.classList.add("active");
+      if (stage === "input") proofInputDetailEl.textContent = detail;
+      if (stage === "logic") proofLogicDetailEl.textContent = detail;
+      if (stage === "automation") proofAutomationDetailEl.textContent = detail;
+      if (stage === "output") proofOutputDetailEl.textContent = detail;
+    }
+
+    function renderInputStage(payload) {
+      renderFlowList(inputStageEl, [
+        `<strong>${payload.product_name || "Unnamed Product"}</strong><div class="meta">Product or idea</div>`,
+        `<strong>Prompt</strong><div class="meta">${payload.prompt || "No prompt supplied."}</div>`,
+        `<strong>Goals</strong><div class="meta">${payload.goals.join(", ") || "No goals supplied."}</div>`,
+        `<strong>Constraints</strong><div class="meta">${payload.constraints.join(", ") || "No constraints supplied."}</div>`,
+      ]);
+    }
+
+    function renderLogicStage(result) {
+      renderFlowList(logicStageEl, [
+        `<strong>${result.mission.primary_idea_type || "General"}</strong><div class="meta">Detected idea type</div>`,
+        `<strong>Grounded Terms</strong><div class="meta">${(result.output.detected_inputs || []).join(", ") || "No terms detected."}</div>`,
+        `<strong>${result.output.selected_template || "Auto"}</strong><div class="meta">Recommended build direction</div>`,
+        `<strong>Reasoning</strong><div class="meta">${result.output.output_summary || "No summary available."}</div>`,
+      ]);
+    }
+
+    function renderAutomationStage(result) {
+      const activeEvent = (result.execution || []).find((event) => event.status === "active");
+      renderFlowList(automationStageEl, [
+        `<strong>${form.executionMode.value}</strong><div class="meta">Execution mode</div>`,
+        `<strong>${result.team.length} agents configured</strong><div class="meta">Automation posture</div>`,
+        `<strong>${activeEvent ? activeEvent.owner : "Staged"}</strong><div class="meta">${activeEvent ? activeEvent.note : "No active execution trace."}</div>`,
+        `<strong>Handoff</strong><div class="meta">${result.git_note || "No handoff note."}</div>`,
+      ]);
+    }
+
+    function renderDetails(result) {
+      renderList(
+        templatesEl,
+        result.template_options.map((option) =>
+          `<strong>${option.name}${option.recommended ? " · Recommended" : ""}</strong><div class="meta">${option.use_case}</div>`
+        )
+      );
+      renderList(
+        teamEl,
+        result.team.map((agent) =>
+          `<strong>${agent.title}</strong><div class="meta">${agent.kickoff_task}</div>`
+        )
+      );
+      renderList(
+        workflowEl,
+        result.workflow.map((step) =>
+          `<strong>Step ${step.step}: ${step.owner}</strong><div class="meta">${step.deliverable}</div>`
+        )
+      );
+      renderList(
+        executionEl,
+        result.execution.map((event) =>
+          `<strong>${event.stage} · ${event.owner}</strong><div class="meta">${event.status} · ${event.note}</div>`
+        )
+      );
+      nextPromptEl.textContent = result.next_prompt || "";
+      gitNoteEl.textContent = result.git_note || "";
+    }
+
+    function updateOutputMode(mode) {
+      state.outputMode = mode;
+      const cookbookVisible = state.cookbookEnabled && mode === "cookbook";
+      artifactToggleButton.classList.toggle("active-toggle", mode === "artifact");
+      cookbookToggleButton.classList.toggle("active-toggle", cookbookVisible);
+      cookbookShellEl.classList.toggle("enabled", cookbookVisible);
+    }
+
+    function ensureChapterExists(name) {
+      const clean = String(name || "").trim();
+      if (!clean) return;
+      if (!state.chapterOrder.includes(clean)) {
+        state.chapterOrder.push(clean);
+      }
+      if (!state.activeChapter) {
+        state.activeChapter = clean;
+      }
+    }
+
+    function normalizeChapterAssignments() {
+      const fallback = state.chapterOrder[0] || "Chapter 1";
+      if (!state.chapterOrder.length) {
+        state.chapterOrder = [fallback];
+      }
+
+      state.recipes = state.recipes.map((recipe) => ({
+        ...recipe,
+        chapter: state.chapterOrder.includes(recipe.chapter) ? recipe.chapter : fallback,
+      }));
+    }
+
+    function renderChapterManager() {
+      normalizeChapterAssignments();
+      chapterListEl.innerHTML = state.chapterOrder
+        .map((chapter) => `
+          <div class="chapter-item ${chapter === state.activeChapter ? "active" : ""}" draggable="true" data-chapter="${escapeHtml(chapter)}">
+            <div class="chapter-anchor">
+              <div>
+                <strong>${escapeHtml(chapter)}</strong>
+                <div class="meta">${state.recipes.filter((recipe) => recipe.chapter === chapter).length} recipe(s)</div>
+              </div>
+              <span class="drag-handle">::</span>
+            </div>
+          </div>
+        `)
+        .join("");
+
+      chapterListEl.querySelectorAll(".chapter-item").forEach((item) => {
+        const chapter = item.dataset.chapter;
+
+        item.addEventListener("click", () => {
+          state.activeChapter = chapter;
+          renderChapterManager();
+          const targetRecipe = document.querySelector(`[data-recipe-chapter="${CSS.escape(chapter)}"]`);
+          if (targetRecipe) {
+            targetRecipe.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        });
+
+        item.addEventListener("dragstart", () => {
+          state.dragChapterName = chapter;
+          item.classList.add("dragging");
+        });
+
+        item.addEventListener("dragend", () => {
+          state.dragChapterName = null;
+          item.classList.remove("dragging");
+        });
+
+        item.addEventListener("dragover", (event) => {
+          event.preventDefault();
+        });
+
+        item.addEventListener("drop", (event) => {
+          event.preventDefault();
+          const dragged = state.dragChapterName;
+          const target = chapter;
+          if (!dragged || dragged === target) return;
+          reorderArray(state.chapterOrder, dragged, target);
+          normalizeChapterAssignments();
+          renderChapterManager();
+          renderRecipeEditor();
+        });
+      });
+    }
+
+    function renderRecipeEditor() {
+      normalizeChapterAssignments();
+      recipeStackEl.innerHTML = state.recipes
+        .map((recipe) => `
+          <article class="recipe-card" draggable="true" data-recipe-id="${recipe.id}" data-recipe-chapter="${escapeHtml(recipe.chapter)}">
+            <div class="recipe-toolbar">
+              <span class="drag-handle">::</span>
+              <strong>${escapeHtml(recipe.title || "Untitled Recipe")}</strong>
+              <button type="button" class="secondary ghost recipe-remove" data-recipe-remove="${recipe.id}">Remove</button>
+            </div>
+
+            <div class="recipe-grid">
+              <label>Title
+                <input data-field="title" data-recipe="${recipe.id}" value="${escapeAttribute(recipe.title)}" placeholder="Recipe title" />
+              </label>
+              <label>Chapter assignment
+                <select data-field="chapter" data-recipe="${recipe.id}">
+                  ${state.chapterOrder
+                    .map((chapter) => `<option value="${escapeAttribute(chapter)}" ${recipe.chapter === chapter ? "selected" : ""}>${escapeHtml(chapter)}</option>`)
+                    .join("")}
+                </select>
+              </label>
+              <label>Servings
+                <input data-field="servings" data-recipe="${recipe.id}" value="${escapeAttribute(recipe.servings)}" placeholder="4 to 6" />
+              </label>
+              <label>Prep Time
+                <input data-field="prepTime" data-recipe="${recipe.id}" value="${escapeAttribute(recipe.prepTime)}" placeholder="20 minutes" />
+              </label>
+              <label>Cook Time
+                <input data-field="cookTime" data-recipe="${recipe.id}" value="${escapeAttribute(recipe.cookTime)}" placeholder="35 minutes" />
+              </label>
+              <label>Headnote
+                <textarea data-field="headnote" data-recipe="${recipe.id}" placeholder="Headnote or recipe introduction">${escapeHtml(recipe.headnote)}</textarea>
+              </label>
+            </div>
+
+            <div class="recipe-grid full">
+              <label>Ingredients
+                <textarea data-field="ingredients" data-recipe="${recipe.id}" placeholder="One ingredient per line">${escapeHtml(recipe.ingredients)}</textarea>
+              </label>
+              <label>Steps
+                <textarea data-field="steps" data-recipe="${recipe.id}" placeholder="Numbered steps or one step per line">${escapeHtml(recipe.steps)}</textarea>
+              </label>
+            </div>
+
+            <div class="recipe-grid full">
+              <label>Paste your own
+                <textarea class="raw-paste" data-field="rawPaste" data-recipe="${recipe.id}" placeholder="Paste an unstructured recipe or rough cooking notes here.">${escapeHtml(recipe.rawPaste)}</textarea>
+              </label>
+            </div>
+
+            <div class="recipe-toolbar">
+              <button type="button" class="secondary parse-button" data-parse-recipe="${recipe.id}">Parse</button>
+            </div>
+          </article>
+        `)
+        .join("");
+
+      recipeStackEl.querySelectorAll("[data-field]").forEach((field) => {
+        field.addEventListener("input", () => {
+          updateRecipeField(field.dataset.recipe, field.dataset.field, field.value);
+        });
+      });
+
+      recipeStackEl.querySelectorAll(".recipe-remove").forEach((button) => {
+        button.addEventListener("click", () => {
+          removeRecipe(button.dataset.recipeRemove);
+        });
+      });
+
+      recipeStackEl.querySelectorAll(".parse-button").forEach((button) => {
+        button.addEventListener("click", async () => {
+          await parseRecipeCard(button.dataset.parseRecipe, button);
+        });
+      });
+
+      recipeStackEl.querySelectorAll(".recipe-card").forEach((card) => {
+        const recipeId = card.dataset.recipeId;
+        card.addEventListener("dragstart", () => {
+          state.dragRecipeId = recipeId;
+          card.classList.add("dragging");
+        });
+        card.addEventListener("dragend", () => {
+          state.dragRecipeId = null;
+          card.classList.remove("dragging");
+        });
+        card.addEventListener("dragover", (event) => {
+          event.preventDefault();
+        });
+        card.addEventListener("drop", (event) => {
+          event.preventDefault();
+          const targetId = recipeId;
+          if (!state.dragRecipeId || state.dragRecipeId === targetId) return;
+          reorderRecipe(state.dragRecipeId, targetId);
+          renderRecipeEditor();
+          renderChapterManager();
+        });
+      });
+    }
+
+    function updateRecipeField(recipeId, field, value) {
+      state.recipes = state.recipes.map((recipe) =>
+        recipe.id === recipeId ? { ...recipe, [field]: value } : recipe
+      );
+      if (field === "chapter") {
+        ensureChapterExists(value);
+        state.activeChapter = value;
+        renderChapterManager();
+      }
+    }
+
+    function addRecipe(recipe = null) {
+      const chapter = state.activeChapter || state.chapterOrder[0] || "Chapter 1";
+      ensureChapterExists(chapter);
+      state.recipes.push(
+        recipe || {
+          id: uid("recipe"),
+          title: "",
+          headnote: "",
+          servings: "",
+          prepTime: "",
+          cookTime: "",
+          ingredients: "",
+          steps: "",
+          chapter,
+          rawPaste: "",
+        }
+      );
+      renderRecipeEditor();
+      renderChapterManager();
+    }
+
+    function removeRecipe(recipeId) {
+      state.recipes = state.recipes.filter((recipe) => recipe.id !== recipeId);
+      if (!state.recipes.length) {
+        addRecipe();
+        return;
+      }
+      renderRecipeEditor();
+      renderChapterManager();
+    }
+
+    function addChapter() {
+      const nextName = `Chapter ${state.chapterOrder.length + 1}`;
+      state.chapterOrder.push(nextName);
+      state.activeChapter = nextName;
+      renderChapterManager();
+      renderRecipeEditor();
+    }
+
+    function reorderArray(items, draggedValue, targetValue) {
+      const next = [...items];
+      const draggedIndex = next.indexOf(draggedValue);
+      const targetIndex = next.indexOf(targetValue);
+      if (draggedIndex === -1 || targetIndex === -1) return;
+      const [moved] = next.splice(draggedIndex, 1);
+      next.splice(targetIndex, 0, moved);
+      items.length = 0;
+      items.push(...next);
+    }
+
+    function reorderRecipe(draggedId, targetId) {
+      const next = [...state.recipes];
+      const draggedIndex = next.findIndex((recipe) => recipe.id === draggedId);
+      const targetIndex = next.findIndex((recipe) => recipe.id === targetId);
+      if (draggedIndex === -1 || targetIndex === -1) return;
+      const [moved] = next.splice(draggedIndex, 1);
+      next.splice(targetIndex, 0, moved);
+      state.recipes = next;
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function escapeAttribute(value) {
+      return escapeHtml(value);
+    }
+
+    function getStoredApiKey() {
+      return localStorage.getItem(STORAGE_KEY) || "";
+    }
+
+    function saveApiKey() {
+      localStorage.setItem(STORAGE_KEY, apiKeyInput.value.trim());
+      updateArtifactStatus("Claude API key saved locally for recipe parsing.", "ready");
+    }
+
+    function clearApiKey() {
+      localStorage.removeItem(STORAGE_KEY);
+      apiKeyInput.value = "";
+      updateArtifactStatus("Claude API key cleared from local storage.", "ready");
+    }
+
+    async function parseRecipeCard(recipeId, button) {
+      const apiKey = getStoredApiKey();
+      if (!apiKey) {
+        updateArtifactStatus("Add a Claude API key before using Parse.", "error");
+        return;
+      }
+
+      const recipe = state.recipes.find((item) => item.id === recipeId);
+      if (!recipe || !recipe.rawPaste.trim()) {
+        updateArtifactStatus("Paste rough recipe text into the card before parsing.", "error");
+        return;
+      }
+
+      const originalLabel = button.textContent;
+      button.textContent = "Parsing...";
+      button.disabled = true;
+
+      try {
+        const parsed = await parseRecipeWithClaude(recipe.rawPaste, recipe.chapter, apiKey);
+        state.recipes = state.recipes.map((item) =>
+          item.id === recipeId
+            ? {
+                ...item,
+                title: parsed.title || item.title,
+                headnote: parsed.headnote || item.headnote,
+                servings: parsed.servings || item.servings,
+                prepTime: parsed.prep_time || item.prepTime,
+                cookTime: parsed.cook_time || item.cookTime,
+                ingredients: Array.isArray(parsed.ingredients) ? parsed.ingredients.join("\n") : item.ingredients,
+                steps: Array.isArray(parsed.steps)
+                  ? parsed.steps.map((step, index) => `${index + 1}. ${step}`).join("\n")
+                  : item.steps,
+                chapter: parsed.chapter || item.chapter,
+              }
+            : item
+        );
+        ensureChapterExists(parsed.chapter || recipe.chapter);
+        state.activeChapter = parsed.chapter || recipe.chapter;
+        renderRecipeEditor();
+        renderChapterManager();
+        updateArtifactStatus("Recipe parsed and fields populated from Claude.", "ready");
+      } catch (error) {
+        console.error(error);
+        updateArtifactStatus(`Parse failed: ${error.message}`, "error");
+      } finally {
+        button.textContent = originalLabel;
+        button.disabled = false;
+      }
+    }
+
+    async function parseRecipeWithClaude(rawText, currentChapter, apiKey) {
+      const prompt = [
+        "Extract a recipe from the pasted text and return only valid JSON.",
+        "Use this exact shape:",
+        '{"title":"","headnote":"","servings":"","prep_time":"","cook_time":"","ingredients":[],"steps":[],"chapter":""}',
+        "Rules:",
+        "- Keep ingredients as an array of plain strings.",
+        "- Keep steps as an array of concise instruction strings.",
+        "- If a field is missing, return an empty string or empty array.",
+        `- Prefer this chapter if the text does not specify one: ${currentChapter || "Chapter 1"}.`,
+        "- Do not include markdown fences or commentary.",
+        "",
+        rawText,
+      ].join("\n");
+
+      const response = await fetch(ANTHROPIC_API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": apiKey,
+          "anthropic-version": "2023-06-01",
+        },
+        body: JSON.stringify({
+          model: ANTHROPIC_MODEL,
+          max_tokens: 1200,
+          temperature: 0.1,
+          messages: [
+            {
+              role: "user",
+              content: prompt,
+            }
+          ],
+        }),
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`Anthropic API ${response.status}: ${text}`);
+      }
+
+      const data = await response.json();
+      const text = (data.content || [])
+        .filter((block) => block.type === "text")
+        .map((block) => block.text)
+        .join("\n")
+        .trim();
+
+      const jsonText = text.replace(/^```json\s*|^```\s*|```$/gim, "").trim();
+      return JSON.parse(jsonText);
+    }
+
+    function exportCookbookHtml() {
+      const chapterGroups = state.chapterOrder.map((chapter) => ({
+        chapter,
+        recipes: state.recipes.filter((recipe) => recipe.chapter === chapter),
+      }));
+
+      const documentTitle = state.latestPayload?.product_name || state.latestResult?.mission?.title || "Cookbook Export";
+      const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>${escapeHtml(documentTitle)}</title>
+  <style>
+    body { font-family: Georgia, serif; margin: 40px auto; max-width: 900px; color: #231b15; line-height: 1.6; }
+    h1, h2, h3 { font-family: "Times New Roman", serif; }
+    h1 { margin-bottom: 10px; }
+    .chapter { margin-top: 36px; }
+    .recipe { margin-top: 26px; padding-top: 18px; border-top: 1px solid #d8c7b0; }
+    .meta { color: #6e5c4c; font-size: 0.95rem; }
+    ul, ol { padding-left: 22px; }
+  </style>
+</head>
+<body>
+  <h1>${escapeHtml(documentTitle)}</h1>
+  <p>${escapeHtml(state.latestResult?.output?.positioning || "")}</p>
+  ${chapterGroups
+    .map(
+      ({ chapter, recipes }) => `
+    <section class="chapter">
+      <h2>${escapeHtml(chapter)}</h2>
+      ${recipes
+        .map(
+          (recipe) => `
+        <article class="recipe">
+          <h3>${escapeHtml(recipe.title || "Untitled Recipe")}</h3>
+          ${recipe.headnote ? `<p>${escapeHtml(recipe.headnote)}</p>` : ""}
+          <p class="meta">
+            ${recipe.servings ? `Servings: ${escapeHtml(recipe.servings)} · ` : ""}
+            ${recipe.prepTime ? `Prep: ${escapeHtml(recipe.prepTime)} · ` : ""}
+            ${recipe.cookTime ? `Cook: ${escapeHtml(recipe.cookTime)}` : ""}
+          </p>
+          <h4>Ingredients</h4>
+          <ul>
+            ${String(recipe.ingredients || "")
+              .split("\n")
+              .map((item) => item.trim())
+              .filter(Boolean)
+              .map((item) => `<li>${escapeHtml(item)}</li>`)
+              .join("")}
+          </ul>
+          <h4>Steps</h4>
+          <ol>
+            ${String(recipe.steps || "")
+              .split("\n")
+              .map((item) => item.replace(/^\d+\.\s*/, "").trim())
+              .filter(Boolean)
+              .map((item) => `<li>${escapeHtml(item)}</li>`)
+              .join("")}
+          </ol>
+        </article>
+      `
+        )
+        .join("")}
+    </section>
+  `
+    )
+    .join("")}
+</body>
+</html>`;
+
+      const blob = new Blob([html], { type: "text/html" });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `${documentTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-") || "cookbook"}.html`;
+      anchor.click();
+      URL.revokeObjectURL(url);
+      updateArtifactStatus("Cookbook HTML export downloaded.", "ready");
+    }
+
+    function resetCookbookState() {
+      state.cookbookEnabled = false;
+      state.chapterOrder = [];
+      state.recipes = [];
+      state.activeChapter = "";
+      cookbookToggleButton.classList.add("hidden");
+      updateOutputMode("artifact");
+      chapterListEl.innerHTML = "";
+      recipeStackEl.innerHTML = "";
+    }
+
+    function enableCookbookMode(result, payload) {
+      state.cookbookEnabled = true;
+      cookbookToggleButton.classList.remove("hidden");
+      createInitialCookbookState(result, payload);
+      renderChapterManager();
+      renderRecipeEditor();
+      updateArtifactStatus("Cookbook editor is available. Toggle into edit mode to structure recipes.", "ready");
+    }
+
+    function clearForm() {
+      form.reset();
+      document.getElementById("productName").value = "";
+      document.getElementById("prompt").value = "";
+      document.getElementById("goals").value = "";
+      document.getElementById("constraints").value = "";
+      artifactCodeEl.textContent = "No artifact yet.";
+      updateArtifactStatus("Submit an idea to generate an artifact or a finish-line roadmap.");
+      inputStageEl.innerHTML = "";
+      logicStageEl.innerHTML = "";
+      automationStageEl.innerHTML = "";
+      templatesEl.innerHTML = "";
+      teamEl.innerHTML = "";
+      workflowEl.innerHTML = "";
+      executionEl.innerHTML = "";
+      nextPromptEl.textContent = "Submit an idea to generate the next build prompt.";
+      gitNoteEl.textContent = "Submit an idea to generate the git handoff note.";
+      state.latestResult = null;
+      state.latestPayload = null;
+      resetProofBlock();
+      resetCookbookState();
+    }
+
+    async function launch(payload) {
+      const response = await fetch("/api/wordup/launch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Launch failed with status ${response.status}`);
+      }
+
+      return response.json();
+    }
+
+    async function submitForm(event) {
+      event.preventDefault();
+
+      const payload = {
+        product_name: form.productName.value.trim(),
+        idea_name: form.ideaName.value.trim(),
+        prompt: form.prompt.value.trim(),
+        template_choice: form.templateChoice.value || null,
+        constraints: splitList(form.constraints.value),
+        goals: splitList(form.goals.value),
+        max_agents: Number(form.maxAgents.value),
+        execution_mode: form.executionMode.value,
+      };
+
+      try {
+        updateArtifactStatus("Generating build output...");
+        resetProofBlock();
+        showProofBlock();
+        activateProofStage(
+          "input",
+          `${payload.product_name || "Unnamed product"} + ${payload.prompt || "No prompt supplied."}`
+        );
+        const result = await launch(payload);
+        state.latestResult = result;
+        state.latestPayload = payload;
+
+        await sleep(120);
+        activateProofStage(
+          "logic",
+          `${result.mission.primary_idea_type || "General"} + ${result.output.selected_template || "Auto"}`
+        );
+        await sleep(120);
+        activateProofStage(
+          "automation",
+          `${form.executionMode.value} + ${result.team.length} agent${result.team.length === 1 ? "" : "s"}`
+        );
+
+        renderInputStage(payload);
+        renderLogicStage(result);
+        renderAutomationStage(result);
+        renderDetails(result);
+
+        const artifactText = buildArtifactText(result, payload);
+        artifactCodeEl.textContent = artifactText;
+
+        if (shouldEnableCookbookMode(result, payload)) {
+          enableCookbookMode(result, payload);
+        } else {
+          resetCookbookState();
+          updateArtifactStatus("Artifact generated. No cookbook editor needed for this idea.", "ready");
+        }
+        await sleep(120);
+        activateProofStage(
+          "output",
+          `${state.cookbookEnabled ? "cookbook" : "artifact"} returned`
+        );
+      } catch (error) {
+        console.error(error);
+        updateArtifactStatus(error.message, "error");
+      }
+    }
+
+    artifactToggleButton.addEventListener("click", () => {
+      updateOutputMode("artifact");
+    });
+
+    cookbookToggleButton.addEventListener("click", () => {
+      if (!state.cookbookEnabled) return;
+      updateOutputMode("cookbook");
+    });
+
+    addRecipeButton.addEventListener("click", () => addRecipe());
+    addChapterButton.addEventListener("click", addChapter);
+    exportCookbookButton.addEventListener("click", exportCookbookHtml);
+    clearButton.addEventListener("click", clearForm);
+    saveApiKeyButton.addEventListener("click", saveApiKey);
+    clearApiKeyButton.addEventListener("click", clearApiKey);
+
+    apiKeyInput.value = getStoredApiKey();
+    form.addEventListener("submit", submitForm);
+    clearForm();
+    document.getElementById("prompt").placeholder = defaultPrompt;
+  </script>
+</body>
+</html>
