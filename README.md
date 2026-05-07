@@ -26,6 +26,65 @@ Then open:
 
 - `http://127.0.0.1:8000/wordup`
 
+## App Entrypoint
+
+Production app entrypoint:
+
+```bash
+agent_slate_app:app
+```
+
+That file currently contains:
+
+```python
+from agent_slate.app import app
+```
+
+So any ASGI host should point at `agent_slate_app:app`.
+
+## Render Deploy
+
+This app is ready for a simple Render web service deploy.
+
+### Option 1: Use `render.yaml`
+
+This repo includes a starter [render.yaml](./render.yaml).
+
+Render settings:
+
+- Runtime: `Python`
+- Build command: `pip install -r requirements.txt`
+- Start command: `uvicorn agent_slate_app:app --host 0.0.0.0 --port $PORT`
+
+### Option 2: Manual Render Setup
+
+Create a new Web Service on Render and use:
+
+- Build Command:
+
+```bash
+pip install -r requirements.txt
+```
+
+- Start Command:
+
+```bash
+uvicorn agent_slate_app:app --host 0.0.0.0 --port $PORT
+```
+
+### After Deploy
+
+Open:
+
+- `/wordup` for the main app
+- `/health` for a simple health check
+
+Notes:
+
+- The frontend is served from the FastAPI app itself.
+- No separate frontend build step is required.
+- If you later move cookbook parsing or auth server-side, add the needed environment variables in Render.
+
 ## Key Files
 
 - `agent_slate/static/index.html` - builder cockpit frontend
